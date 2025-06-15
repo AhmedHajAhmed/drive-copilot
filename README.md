@@ -93,40 +93,42 @@ const testCases = [
 
 ### Evaluation Metrics
 
-1. **Accuracy (30%)**
+1. **Accuracy (40%)**
    - Response correctness
    - Information precision
    - Factual accuracy
+   - Matches with expected content
 
-2. **Completeness (20%)**
+2. **Completeness (30%)**
    - Coverage of required information
-   - Missing data detection
+   - Content coverage
+   - Response structure
    - Information gaps
 
-3. **Context Awareness (10%)**
-   - Query context preservation
-   - Relevant information selection
-   - Contextual understanding
-
-4. **Information Synthesis (10%)**
-   - Multiple source integration
-   - Information combination
-   - Coherent response generation
-
-5. **Clarity (10%)**
+3. **Clarity (20%)**
    - Response formatting
    - Readability
    - Structure
+   - Organization
 
-6. **Source Attribution (10%)**
+4. **Sources (10%)**
    - Source identification
    - Reference accuracy
    - Citation clarity
-
-7. **Source Quality (10%)**
    - Source relevance
-   - Source accuracy
-   - Source diversity
+
+### Scoring System
+
+Each metric is scored on a scale of 0-5, and the final score is calculated using weighted percentages:
+- Accuracy: 40% of total score
+- Completeness: 30% of total score
+- Clarity: 20% of total score
+- Sources: 10% of total score
+
+Example calculation:
+```
+Final Score = (Accuracy × 0.4) + (Completeness × 0.3) + (Clarity × 0.2) + (Sources × 0.1)
+```
 
 ### Setup and Installation
 
