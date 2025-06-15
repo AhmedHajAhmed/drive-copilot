@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drive Copilot Test Runner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-case.passed {
+            border-left: 4px solid #4CAF50;
+        }
+        .test-case.failed {
+            border-left: 4px solid #f44336;
+        }
+        .test-case.running {
+            border-left: 4px solid #2196F3;
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .test-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .test-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .status-running {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+        .status-passed {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        .status-failed {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+        .test-details {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .test-query {
+            margin-bottom: 10px;
+        }
+        .test-response {
+            white-space: pre-wrap;
+        }
+        .test-evaluation {
+            margin-top: 10px;
+        }
+        .evaluation-metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #runAll {
+            background: #2196F3;
+            color: white;
+        }
+        #runAll:hover {
+            background: #1976D2;
+        }
+        #exportResults {
+            background: #4CAF50;
+            color: white;
+        }
+        #exportResults:hover {
+            background: #2E7D32;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .summary h2 {
+            margin-top: 0;
+        }
+        .summary-metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        #extensionStatus {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .status-connected {
+            background: #e6ffe6;
+            color: #006600;
+        }
+        .status-disconnected {
+            background: #ffe6e6;
+            color: #cc0000;
+        }
+        .status-error {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .reload-button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .reload-button:hover {
+            background-color: #45a049;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .connection-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .summary {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .summary h3 {
+            margin: 0 0 1rem 0;
+            color: #495057;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .summary-stats div {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .test-results {
+            margin-top: 2rem;
+        }
+        .test-case {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .test-case .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .test-case .status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        .test-case .status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .test-case .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .test-case .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .test-case .response {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+        .test-case .response-content {
+            white-space: pre-wrap;
+            margin-bottom: 1rem;
+        }
+        .test-case .response-time {
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        .test-case .evaluation {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        .test-case .score {
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .test-case .metrics,
+        .test-case .details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+        }
+        .test-case .error {
+            color: #dc3545;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background: #f8d7da;
+            border-radius: 4px;
+        }
+        .test-runner {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-content {
+            margin-top: 10px;
+        }
+        .query {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .response {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .response h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .response-content {
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        .sources {
+            margin: 15px 0;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 6px;
+        }
+        .sources h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .sources ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .sources li {
+            margin: 5px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .source-type {
+            color: #6c757d;
+            font-size: 0.9em;
+            padding: 2px 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+        }
+        .sources a {
+            color: #2196F3;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .sources a:hover {
+            text-decoration: underline;
+        }
+        .metrics {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .score {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2196F3;
+        }
+        .metric {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .status.pending {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .status.completed {
+            background: #e6ffe6;
+            color: #006600;
+        }
+        .status.error {
+            background: #ffe6e6;
+            color: #cc0000;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 0;
+        }
+        .button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .evaluation-metrics {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .evaluation-metrics h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .metric-card h4 {
+            margin: 0 0 10px 0;
+            color: #2196F3;
+        }
+        
+        .metric-card p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .file-link {
+            cursor: pointer;
+            color: #2196F3;
+            text-decoration: none;
+            font-size: 0.9em;
+            padding: 2px 6px;
+            background: #e3f2fd;
+            border-radius: 3px;
+        }
+        
+        .file-link:hover {
+            background: #bbdefb;
+        }
+        .source-content {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .source-content pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .sources li {
+            margin-bottom: 15px;
+        }
+        
+        .sources li:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Drive Copilot Test Runner</h1>
+        
+        <div class="connection-status">
+            <div id="extensionStatus">Checking extension connection...</div>
+        </div>
+
+        <div class="test-summary">
+            <h3>Test Summary</h3>
+            <div>Total Tests: 0</div>
+            <div>Completed: 0</div>
+            <div>Failed: 0</div>
+            <div>Average Score: 0/5</div>
+            <div>Average Response Time: 0ms</div>
+        </div>
+
+        <div class="evaluation-metrics">
+            <h3>Evaluation Metrics</h3>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h4>Accuracy (40%)</h4>
+                    <p>Measures how well the response matches expected content. Checks if all required information is present and correct.</p>
+                </div>
+                <div class="metric-card">
+                    <h4>Completeness (30%)</h4>
+                    <p>Evaluates content coverage and structure. Considers both the amount of information provided and how well it's organized.</p>
+                </div>
+                <div class="metric-card">
+                    <h4>Clarity (20%)</h4>
+                    <p>Assesses response structure and readability. Checks for proper formatting, organization, and use of transition words.</p>
+                </div>
+                <div class="metric-card">
+                    <h4>Sources (10%)</h4>
+                    <p>Evaluates source attribution quality. Considers number of sources, source details, and relevance to the query.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="runAll">Run All Tests</button>
+        </div>
+
+        <div id="testList" class="test-results"></div>
+    </div>
+
+    <script>
+        // Initialize extension connection state
+        let extensionId = null;
+        let isExtensionAvailable = false;
+        let connectionCheckInterval = null;
+        let pendingTests = new Map();
+        let isContextValid = true;
+
+        // Test categories and their evaluation weights
+        const testCategories = {
+            factual: {
+                name: 'Factual Queries',
+                description: 'Queries about specific facts, dates, numbers, or events',
+                evaluation: {
+                    accuracy: 0.4,
+                    completeness: 0.3,
+                    sourceAttribution: 0.3
+                }
+            },
+            analytical: {
+                name: 'Analytical Queries',
+                description: 'Queries requiring analysis of multiple documents or data points',
+                evaluation: {
+                    contextAwareness: 0.3,
+                    informationSynthesis: 0.4,
+                    sourceAttribution: 0.3
+                }
+            },
+            temporal: {
+                name: 'Temporal Queries',
+                description: 'Queries about timelines, schedules, or historical information',
+                evaluation: {
+                    accuracy: 0.3,
+                    contextAwareness: 0.3,
+                    informationSynthesis: 0.4
+                }
+            },
+            comparative: {
+                name: 'Comparative Queries',
+                description: 'Queries comparing different aspects or documents',
+                evaluation: {
+                    contextAwareness: 0.3,
+                    informationSynthesis: 0.4,
+                    sourceAttribution: 0.3
+                }
+            }
+        };
+
+        // Test cases
+        const testCases = [
+            {
+                id: 'timeline',
+                name: 'Project Timeline Query',
+                query: 'What are the key milestones in Q2?',
+                expected: {
+                    required: {
+                        dates: ['April 15', 'May 1', 'May 15', 'June 1', 'June 30'],
+                        events: ['Complete MVP development', 'Begin beta testing', 'Launch marketing campaign', 'Release v1.0', 'Achieve 1000 users']
+                    }
+                }
+            },
+            {
+                id: 'budget',
+                name: 'Budget Analysis Query',
+                query: 'How is the budget allocated across different phases?',
+                expected: {
+                    required: {
+                        amounts: ['$200,000', '$100,000', '$50,000'],
+                        events: ['Development Phase (40%)', 'Marketing Phase (30%)', 'Operations Phase (30%)']
+                    }
+                }
+            },
+            {
+                id: 'team',
+                name: 'Team Structure Query',
+                query: 'Who are the key members of the project team?',
+                expected: {
+                    required: {
+                        members: ['John Smith', 'Sarah Johnson', 'Michael Chen', 'Alex Rodriguez', 'Emily Brown', 'David Kim', 'Lisa Wang'],
+                        roles: ['CEO', 'CTO', 'COO', 'Lead Engineer', 'Frontend Developer', 'Backend Developer', 'DevOps Engineer']
+                    }
+                }
+            },
+            {
+                id: 'marketing',
+                name: 'Marketing Strategy Query',
+                query: 'What are the main marketing channels and targets for 2024?',
+                expected: {
+                    required: {
+                        events: ['Social media', 'Content marketing', 'Email marketing', 'Industry events', 'Partner programs'],
+                        members: ['Enterprise customers', 'Small businesses', 'Individual professionals']
+                    }
+                }
+            },
+            {
+                id: 'risks',
+                name: 'Risk Assessment Query',
+                query: 'What are the main risks identified in the project plan?',
+                expected: {
+                    required: {
+                        events: ['Integration challenges', 'Performance issues', 'Security vulnerabilities', 'Competitor response', 'Market adoption rate', 'Pricing sensitivity', 'Team scaling', 'Resource constraints', 'Timeline delays']
+                    }
+                }
+            }
+        ];
+
+        // Results storage
+        let results = {
+            timestamp: new Date().toISOString(),
+            testCases: [],
+            summary: {
+                totalTests: 0,
+                passedTests: 0,
+                passRate: 0,
+                averageResponseTime: 0,
+                averageAccuracy: 0,
+                averageCompleteness: 0,
+                averageRelevance: 0,
+                averageClarity: 0,
+                averageSourceAttribution: 0
+            }
+        };
+
+        // Mock test documents for standalone mode
+        const mockDocuments = {
+            'project_timeline.md': `
+# Project Timeline 2024
+
+## Q2 Milestones
+- April 15: Complete MVP development
+- May 1: Begin beta testing
+- May 15: Launch marketing campaign
+- June 1: Release v1.0
+- June 30: Achieve 1000 users
+            `,
+            'budget.md': `
+# Budget Allocation 2024
+
+## Development Phase (40%)
+- Engineering team: $200,000
+- Infrastructure: $100,000
+- Tools and licenses: $50,000
+
+## Marketing Phase (30%)
+- Digital marketing: $100,000
+- Content creation: $50,000
+- Events and PR: $75,000
+
+## Operations Phase (30%)
+- Office space: $50,000
+- Team support: $100,000
+- Miscellaneous: $75,000
+            `,
+            'team.md': `
+# Project Team Structure
+
+## Leadership
+- John Smith (CEO)
+- Sarah Johnson (CTO)
+- Michael Chen (COO)
+
+## Development Team
+- Alex Rodriguez (Lead Engineer)
+- Emily Brown (Frontend Developer)
+- David Kim (Backend Developer)
+- Lisa Wang (DevOps Engineer)
+
+## Marketing Team
+- Rachel Green (Marketing Director)
+- Tom Wilson (Content Manager)
+- Jessica Lee (Social Media Specialist)
+            `,
+            'marketing.md': `
+# Marketing Strategy 2024
+
+## Target Markets
+- Enterprise customers
+- Small businesses
+- Individual professionals
+
+## Marketing Channels
+- Social media (LinkedIn, Twitter)
+- Content marketing (Blog, Whitepapers)
+- Email marketing
+- Industry events
+- Partner programs
+
+## Goals
+- Q2: 1000 users
+- Q3: 5000 users
+- Q4: 10000 users
+            `,
+            'risks.md': `
+# Project Risk Assessment
+
+## Technical Risks
+- Integration challenges with legacy systems
+- Performance issues at scale
+- Security vulnerabilities
+
+## Market Risks
+- Competitor response
+- Market adoption rate
+- Pricing sensitivity
+
+## Operational Risks
+- Team scaling
+- Resource constraints
+- Timeline delays
+            `
+        };
+
+        // Add this function at the top level
+        function getBasePath() {
+            // If running in extension context
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                return chrome.runtime.getURL('');
+            }
+            // If running standalone, use the current directory
+            return window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+        }
+
+        // Update the mock response generator
+        function generateMockResponse(query, testCase) {
+            console.log('Generating mock response for query:', query);
+            
+            // Find relevant documents based on query and test case
+            const relevantDocs = Object.entries(mockDocuments)
+                .filter(([filename, content]) => {
+                    // Get all required items from test case, handling undefined cases
+                    const requiredItems = [];
+                    
+                    if (testCase.expected?.required) {
+                        if (testCase.expected.required.dates) {
+                            requiredItems.push(...testCase.expected.required.dates);
+                        }
+                        if (testCase.expected.required.events) {
+                            requiredItems.push(...testCase.expected.required.events);
+                        }
+                        if (testCase.expected.required.amounts) {
+                            requiredItems.push(...testCase.expected.required.amounts);
+                        }
+                        if (testCase.expected.required.members) {
+                            requiredItems.push(...testCase.expected.required.members);
+                        }
+                        if (testCase.expected.required.roles) {
+                            requiredItems.push(...testCase.expected.required.roles);
+                        }
+                    }
+                    
+                    // If no required items, match against query
+                    if (requiredItems.length === 0) {
+                        return content.toLowerCase().includes(query.toLowerCase());
+                    }
+                    
+                    // Check if any required item is in the content
+                    return requiredItems.some(item => 
+                        content.toLowerCase().includes(item.toLowerCase())
+                    );
+                })
+                .map(([filename, content]) => ({
+                    name: filename,
+                    content: content,
+                    type: 'markdown',
+                    link: `${getBasePath()}${filename}`
+                }));
+
+            if (relevantDocs.length === 0) {
+                return {
+                    summary: `No relevant information found for: ${query}`,
+                    sources: [],
+                    responseTime: 1000
+                };
+            }
+
+            // Generate a summary based on the relevant content and test case requirements
+            const summary = relevantDocs.map(doc => {
+                const lines = doc.content.split('\n')
+                    .filter(line => {
+                        const lineLower = line.toLowerCase();
+                        // If no events required, include all non-empty lines
+                        if (!testCase.expected?.required?.events) {
+                            return line.trim() && !line.startsWith('#');
+                        }
+                        // Otherwise, only include lines that match required events
+                        return line.trim() && 
+                               !line.startsWith('#') &&
+                               testCase.expected.required.events.some(event => 
+                                   lineLower.includes(event.toLowerCase())
+                               );
+                    })
+                    .map(line => line.trim());
+                return lines.join('\n');
+            }).join('\n\n');
+
+            return {
+                summary: summary,
+                sources: relevantDocs,
+                responseTime: 1000
+            };
+        }
+
+        // Function to handle page reload
+        function reloadPage() {
+            window.location.reload();
+        }
+
+        // Function to add reload button
+        function addReloadButton() {
+            const statusElement = document.getElementById('extensionStatus');
+            if (!statusElement.querySelector('.reload-button')) {
+                const reloadButton = document.createElement('button');
+                reloadButton.className = 'reload-button';
+                reloadButton.textContent = 'Reload Page';
+                reloadButton.onclick = reloadPage;
+                statusElement.appendChild(reloadButton);
+            }
+        }
+
+        // Add message listener for content script communication
+        window.addEventListener('message', async (event) => {
+            console.log('Received message:', event.data);
+            
+            if (event.data.type === 'CONTENT_SCRIPT_READY') {
+                console.log('Content script is ready');
+                updateConnectionStatus('connected');
+            } else if (event.data.type === 'EXTENSION_ID') {
+                console.log('Received extension ID:', event.data.extensionId);
+                extensionId = event.data.extensionId;
+                updateConnectionStatus('connected');
+            } else if (event.data.type === 'PING_RESPONSE') {
+                console.log('Received ping response');
+                updateConnectionStatus('connected');
+            } else if (event.data.type === 'TEST_RESPONSE') {
+                console.log('Received test response:', event.data);
+                const testId = event.data.testId;
+                if (!testId) {
+                    console.error('No test ID in response:', event.data);
+                    return;
+                }
+                const testCase = pendingTests.get(testId);
+                if (testCase) {
+                    handleTestResponse(testCase, event.data.response);
+                } else {
+                    console.error('No pending test found for ID:', testId);
+                }
+            } else if (event.data.type === 'CONTEXT_INVALIDATED') {
+                console.log('Extension context invalidated');
+                isContextValid = false;
+                updateConnectionStatus('error', 'Extension context invalidated. Please reload the page.');
+                addReloadButton();
+                pendingTests.clear();
+            }
+        });
+
+        // Update connection status UI
+        function updateConnectionStatus(connected) {
+            console.log('Updating connection status:', connected);
+            const statusElement = document.getElementById('extensionStatus');
+            const runAllButton = document.getElementById('runAll');
+            
+            if (statusElement) {
+                statusElement.textContent = connected ? 'Extension Connected' : 'Extension Disconnected';
+                statusElement.className = `status ${connected ? 'connected' : 'disconnected'}`;
+            } else {
+                console.error('Connection status element not found');
+            }
+
+            if (runAllButton) {
+                runAllButton.disabled = !connected;
+            } else {
+                console.error('Run all tests button not found');
+            }
+        }
+
+        // Check extension connection
+        function checkExtensionConnection() {
+            console.log('Checking extension connection...');
+            const isChromeExtension = typeof chrome !== 'undefined' && chrome.runtime;
+            console.log('Running in Chrome extension context:', isChromeExtension);
+            
+            if (isChromeExtension) {
+                // Check initial connection
+                chrome.runtime.sendMessage({ type: 'CHECK_CONNECTION' }, response => {
+                    console.log('Connection check response:', response);
+                    updateConnectionStatus(response?.connected || false);
+                });
+            } else {
+                console.log('Running in standalone mode');
+                updateConnectionStatus(true); // Enable tests in standalone mode
+            }
+
+            // Set up message listener
+            window.addEventListener('message', event => {
+                console.log('Received message:', event.data);
+                if (event.data.type === 'CONTENT_SCRIPT_READY') {
+                    console.log('Content script is ready');
+                    updateConnectionStatus(true);
+                }
+            });
+        }
+
+        // Update the runTestCase function to properly handle test status
+        async function runTestCase(testCase) {
+            console.log('Running test case:', testCase);
+            const testElement = document.getElementById(`test-${testCase.id}`);
+            if (testElement) {
+                const statusElement = testElement.querySelector('.status');
+                if (statusElement) {
+                    statusElement.textContent = 'Running';
+                    statusElement.className = 'status running';
+                }
+            }
+
+            const startTime = Date.now();
+            try {
+                const response = await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Test timed out'));
+                    }, 30000);
+
+                    const messageHandler = (event) => {
+                        if (event.data.type === 'TEST_RESPONSE' && event.data.testId === testCase.id) {
+                            clearTimeout(timeout);
+                            window.removeEventListener('message', messageHandler);
+                            resolve(event.data.response);
+                        }
+                    };
+
+                    window.addEventListener('message', messageHandler);
+
+                    if (typeof chrome !== 'undefined' && chrome.runtime) {
+                        chrome.runtime.sendMessage({
+                            type: 'RUN_TEST',
+                            query: testCase.query
+                        });
+                    } else {
+                        setTimeout(() => {
+                            const mockResponse = generateMockResponse(testCase.query, testCase);
+                            console.log('Generated mock response:', mockResponse);
+                            resolve(mockResponse);
+                        }, 1000);
+                    }
+                });
+
+                const responseTime = Date.now() - startTime;
+                await handleTestResponse(testCase, response, responseTime);
+                
+                // Update test case status
+                if (testElement) {
+                    const statusElement = testElement.querySelector('.status');
+                    if (statusElement) {
+                        statusElement.textContent = 'Completed';
+                        statusElement.className = 'status completed';
+                    }
+                }
+                
+                // Update summary after successful completion
+                updateSummary();
+                
+            } catch (error) {
+                console.error('Error running test case:', error);
+                if (testElement) {
+                    const statusElement = testElement.querySelector('.status');
+                    if (statusElement) {
+                        statusElement.textContent = 'Error';
+                        statusElement.className = 'status error';
+                    }
+                }
+                // Update summary even if test fails
+                updateSummary();
+                throw error;
+            }
+        }
+
+        // Handle test response
+        async function handleTestResponse(testCase, response, responseTime) {
+            console.log('Handling test response:', { testCase, response, responseTime });
+            
+            // Extract sources from the response
+            const sources = response.sources || [];
+            console.log('Extracted sources:', sources);
+            
+            // Create evaluation object
+            const evaluation = {
+                summary: response.summary || response.text || 'No response generated',
+                sources: sources,
+                metrics: {
+                    accuracy: evaluateAccuracy(response, testCase),
+                    completeness: evaluateCompleteness(response, testCase),
+                    clarity: evaluateClarity(response),
+                    sources: evaluateSourceAttribution(response)
+                },
+                responseTime: responseTime
+            };
+            
+            // Calculate weighted score
+            evaluation.weightedScore = calculateWeightedScore(evaluation.metrics);
+            
+            console.log('Evaluation:', evaluation);
+            
+            // Update the UI with the results
+            updateTestResult(testCase, evaluation);
+            
+            // Update the summary
+            updateSummary();
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            console.log('Starting all tests...');
+            const runAllButton = document.getElementById('runAll');
+            if (runAllButton) {
+                runAllButton.disabled = true;
+                runAllButton.textContent = 'Running Tests...';
+            }
+
+            try {
+                const results = [];
+                for (const testCase of testCases) {
+                    console.log('Running test case:', testCase);
+                    const result = await runTestCase(testCase);
+                    results.push(result);
+                }
+                console.log('All tests completed:', results);
+                return results;
+            } catch (error) {
+                console.error('Error running tests:', error);
+                throw error;
+            } finally {
+                if (runAllButton) {
+                    runAllButton.disabled = false;
+                    runAllButton.textContent = 'Run All Tests';
+                }
+            }
+        }
+
+        // Enhanced evaluation functions
+        function evaluateResponse(response, testCase) {
+            console.log('Evaluating response:', { response, testCase });
+            
+            // Get category weights
+            const category = testCase.category || 'factual'; // Default to factual if category is missing
+            const weights = testCategories[category].evaluation;
+            
+            // Calculate individual metrics
+            const accuracy = evaluateAccuracy(response, testCase.expected);
+            const completeness = evaluateCompleteness(response, testCase.expected);
+            const contextAwareness = evaluateContextAndCitations(response, testCase.expected);
+            const informationSynthesis = evaluateInformationSynthesis(response, testCase.expected);
+            const clarity = evaluateClarity(response);
+            const sourceAttribution = evaluateSourceAttribution(response);
+
+            // Calculate weighted score
+            const weightedScore = (
+                accuracy * weights.accuracy +
+                completeness * weights.completeness +
+                contextAwareness * weights.contextAwareness +
+                informationSynthesis * weights.informationSynthesis
+            );
+
+            return {
+                passed: weightedScore >= 3.5,
+                weightedScore,
+                metrics: {
+                    accuracy,
+                    completeness,
+                    contextAwareness,
+                    informationSynthesis,
+                    clarity,
+                    sourceAttribution
+                }
+            };
+        }
+
+        // Function to calculate weighted score
+        function calculateWeightedScore(metrics) {
+            const weights = {
+                accuracy: 0.4,    // 40% weight
+                completeness: 0.3, // 30% weight
+                clarity: 0.2,     // 20% weight
+                sources: 0.1      // 10% weight
+            };
+            
+            return (
+                metrics.accuracy * weights.accuracy +
+                metrics.completeness * weights.completeness +
+                metrics.clarity * weights.clarity +
+                metrics.sources * weights.sources
+            );
+        }
+
+        // Function to evaluate accuracy
+        function evaluateAccuracy(response, testCase) {
+            if (!response || !response.summary) return 0;
+            
+            const summary = response.summary.toLowerCase();
+            const expectedContent = testCase.expected.required;
+            let matches = 0;
+            let total = 0;
+            
+            // Check each type of required content
+            if (expectedContent.dates) {
+                total += expectedContent.dates.length;
+                matches += expectedContent.dates.filter(date => 
+                    summary.includes(date.toLowerCase())
+                ).length;
+            }
+            
+            if (expectedContent.events) {
+                total += expectedContent.events.length;
+                matches += expectedContent.events.filter(event => 
+                    summary.includes(event.toLowerCase())
+                ).length;
+            }
+            
+            if (expectedContent.amounts) {
+                total += expectedContent.amounts.length;
+                matches += expectedContent.amounts.filter(amount => 
+                    summary.includes(amount.toLowerCase())
+                ).length;
+            }
+            
+            if (expectedContent.members) {
+                total += expectedContent.members.length;
+                matches += expectedContent.members.filter(member => 
+                    summary.includes(member.toLowerCase())
+                ).length;
+            }
+            
+            if (expectedContent.roles) {
+                total += expectedContent.roles.length;
+                matches += expectedContent.roles.filter(role => 
+                    summary.includes(role.toLowerCase())
+                ).length;
+            }
+            
+            return total > 0 ? (matches / total) * 5 : 0;
+        }
+
+        // Function to evaluate completeness
+        function evaluateCompleteness(response, testCase) {
+            if (!response || !response.summary) return 0;
+            
+            const summary = response.summary.toLowerCase();
+            const expectedContent = testCase.expected.required;
+            let matches = 0;
+            let total = 0;
+            
+            // Check each type of required content
+            if (expectedContent.dates) {
+                total += expectedContent.dates.length;
+                matches += expectedContent.dates.filter(date => 
+                    summary.includes(date.toLowerCase())
+                ).length;
+            }
+            
+            if (expectedContent.events) {
+                total += expectedContent.events.length;
+                matches += expectedContent.events.filter(event => 
+                    summary.includes(event.toLowerCase())
+                ).length;
+            }
+            
+            if (expectedContent.amounts) {
+                total += expectedContent.amounts.length;
+                matches += expectedContent.amounts.filter(amount => 
+                    summary.includes(amount.toLowerCase())
+                ).length;
+            }
+            
+            if (expectedContent.members) {
+                total += expectedContent.members.length;
+                matches += expectedContent.members.filter(member => 
+                    summary.includes(member.toLowerCase())
+                ).length;
+            }
+            
+            if (expectedContent.roles) {
+                total += expectedContent.roles.length;
+                matches += expectedContent.roles.filter(role => 
+                    summary.includes(role.toLowerCase())
+                ).length;
+            }
+            
+            return total > 0 ? (matches / total) * 5 : 0;
+        }
+
+        // Function to evaluate clarity
+        function evaluateClarity(response) {
+            if (!response || !response.summary) return 0;
+            
+            const summary = response.summary;
+            
+            // Check for structure
+            const hasStructure = summary.includes('\n') || 
+                                summary.includes('•') ||
+                                summary.includes('-');
+            
+            // Check for formatting
+            const hasFormatting = summary.includes(':') || 
+                                 summary.includes('(') ||
+                                 summary.includes(')');
+            
+            // Check for organization
+            const hasOrganization = summary.includes('1.') ||
+                                   summary.includes('2.') ||
+                                   summary.includes('First') ||
+                                   summary.includes('Second');
+            
+            if (hasStructure && hasFormatting && hasOrganization) return 5;
+            if ((hasStructure && hasFormatting) || (hasStructure && hasOrganization)) return 4;
+            if (hasStructure || hasFormatting || hasOrganization) return 3;
+            return 2;
+        }
+
+        // Function to evaluate source attribution
+        function evaluateSourceAttribution(response) {
+            if (!response || !response.sources) return 0;
+            
+            const sources = response.sources;
+            
+            // Check for multiple sources
+            const hasMultipleSources = sources.length >= 2;
+            
+            // Check for source details
+            const hasSourceDetails = sources.some(source => 
+                source.name && source.type && source.link
+            );
+            
+            // Check for source relevance
+            const hasRelevantSources = sources.some(source => 
+                source.name && source.type
+            );
+            
+            if (hasMultipleSources && hasSourceDetails && hasRelevantSources) return 5;
+            if ((hasMultipleSources && hasSourceDetails) || (hasMultipleSources && hasRelevantSources)) return 4;
+            if (hasMultipleSources || hasSourceDetails || hasRelevantSources) return 3;
+            return 2;
+        }
+
+        function evaluateInformationSynthesis(response, testCase) {
+            if (!response || !response.summary) return 0;
+            
+            const summary = response.summary.toLowerCase();
+            const requiredItems = [
+                ...(testCase.expected.required.dates || []),
+                ...(testCase.expected.required.events || []),
+                ...(testCase.expected.required.amounts || []),
+                ...(testCase.expected.required.members || []),
+                ...(testCase.expected.required.roles || [])
+            ].map(item => item.toLowerCase());
+            
+            if (requiredItems.length === 0) return 0;
+            
+            // Check how many required items are synthesized in the response
+            const synthesisScore = requiredItems.reduce((score, item) => {
+                return score + (summary.includes(item) ? 1 : 0);
+            }, 0) / requiredItems.length;
+            
+            return Math.min(5, Math.max(0, synthesisScore * 5));
+        }
+
+        function evaluateContextAwareness(response, testCase) {
+            if (!response || !response.summary) return 0;
+            
+            const summary = response.summary.toLowerCase();
+            const query = testCase.query.toLowerCase();
+            
+            // Check if response maintains context from query
+            const contextScore = query.split(' ')
+                .filter(word => word.length > 3) // Ignore short words
+                .reduce((score, word) => {
+                    return score + (summary.includes(word) ? 1 : 0);
+                }, 0) / Math.max(1, query.split(' ').filter(word => word.length > 3).length);
+            
+            return Math.min(5, Math.max(0, contextScore * 5));
+        }
+
+        function evaluateContextAndCitations(response, expected) {
+            let evaluation = {
+                contextScore: 0,
+                citationScore: 0,
+                details: {
+                    contextPreservation: 0,
+                    informationSynthesis: 0,
+                    sourceRelevance: 0,
+                    sourceAccuracy: 0
+                }
+            };
+
+            // Safely check if response and summary exist
+            if (!response || !response.summary) {
+                console.warn('Response or summary is undefined:', response);
+                return evaluation;
+            }
+
+            // Check source relevance
+            if (response.sources && response.sources.length > 0) {
+                evaluation.details.sourceRelevance = Math.min(5, response.sources.length);
+            }
+
+            // Check source accuracy
+            if (expected.sources) {
+                const sourceMatches = response.sources?.filter(source => 
+                    expected.sources.includes(source.name)
+                ) || [];
+                evaluation.details.sourceAccuracy = 
+                    (sourceMatches.length / expected.sources.length) * 5;
+            }
+
+            // Check context preservation
+            if (expected.optional?.context) {
+                const contextMatches = expected.optional.context.filter(context => 
+                    response.summary.includes(context)
+                );
+                evaluation.details.contextPreservation = 
+                    (contextMatches.length / expected.optional.context.length) * 5;
+            }
+
+            // Check information synthesis
+            const hasSynthesis = response.summary.includes('based on') || 
+                               response.summary.includes('according to') ||
+                               response.summary.includes('as shown in');
+            evaluation.details.informationSynthesis = hasSynthesis ? 5 : 0;
+
+            // Calculate final scores
+            evaluation.contextScore = (
+                evaluation.details.contextPreservation * 0.4 +
+                evaluation.details.informationSynthesis * 0.6
+            );
+
+            evaluation.citationScore = (
+                evaluation.details.sourceRelevance * 0.5 +
+                evaluation.details.sourceAccuracy * 0.5
+            );
+
+            return evaluation;
+        }
+
+        // Update summary
+        function updateSummary() {
+            console.log('Updating summary...');
+            const testElements = document.querySelectorAll('.test-case');
+            console.log('Found test elements:', testElements.length);
+            
+            const completedTests = Array.from(testElements).filter(el => 
+                el.querySelector('.status.completed')
+            );
+            console.log('Completed tests:', completedTests.length);
+            
+            const failedTests = Array.from(testElements).filter(el => 
+                el.querySelector('.status.error')
+            );
+            console.log('Failed tests:', failedTests.length);
+            
+            // Calculate average score
+            const scores = completedTests.map(el => {
+                const scoreElement = el.querySelector('.score');
+                if (scoreElement) {
+                    const scoreText = scoreElement.textContent;
+                    const match = scoreText.match(/[\d.]+/);
+                    if (match) {
+                        return parseFloat(match[0]);
+                    }
+                }
+                return 0;
+            });
+            
+            const averageScore = scores.length > 0 
+                ? scores.reduce((a, b) => a + b, 0) / scores.length 
+                : 0;
+            console.log('Average score:', averageScore);
+            
+            // Calculate average response time
+            const responseTimes = completedTests.map(el => {
+                const timeElement = el.querySelector('.response-time');
+                if (timeElement) {
+                    const timeText = timeElement.textContent;
+                    const match = timeText.match(/\d+/);
+                    if (match) {
+                        return parseInt(match[0]);
+                    }
+                }
+                return 0;
+            });
+            
+            const averageResponseTime = responseTimes.length > 0 
+                ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length 
+                : 0;
+            console.log('Average response time:', averageResponseTime);
+            
+            // Update summary display
+            const summaryElement = document.querySelector('.test-summary');
+            if (summaryElement) {
+                console.log('Updating summary element');
+                summaryElement.innerHTML = `
+                    <h3>Test Summary</h3>
+                    <div>Total Tests: ${testElements.length}</div>
+                    <div>Completed: ${completedTests.length}</div>
+                    <div>Failed: ${failedTests.length}</div>
+                    <div>Average Score: ${averageScore.toFixed(2)}/5</div>
+                    <div>Average Response Time: ${averageResponseTime.toFixed(0)}ms</div>
+                `;
+            } else {
+                console.error('Summary element not found!');
+            }
+        }
+
+        // Export results
+        function exportResults() {
+            const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `test_results_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize the test runner
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Initializing test runner');
+            initializeTestCases();
+            checkExtensionConnection();
+
+            // Set up event listeners
+            const runAllButton = document.getElementById('runAll');
+            if (runAllButton) {
+                runAllButton.addEventListener('click', async () => {
+                    await runAllTests();
+                });
+            } else {
+                console.error('Run all tests button not found');
+            }
+
+            // Notify content script that we're ready if in extension context
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                window.postMessage({ type: 'TEST_RUNNER_READY' }, '*');
+            }
+        });
+
+        // Initialize test cases in the UI
+        function initializeTestCases() {
+            const testList = document.getElementById('testList');
+            if (!testList) {
+                console.error('Test list element not found');
+                return;
+            }
+
+            testCases.forEach(testCase => {
+                const testElement = document.createElement('div');
+                testElement.id = `test-${testCase.id}`;
+                testElement.className = 'test-case';
+                testElement.innerHTML = `
+                    <div class="test-header">
+                        <h3>${testCase.name}</h3>
+                        <div class="status pending">Pending</div>
+                    </div>
+                    <div class="test-content">
+                        <div class="query">${testCase.query}</div>
+                        <div class="result"></div>
+                    </div>
+                `;
+                testList.appendChild(testElement);
+            });
+        }
+
+        function updateTestResult(testCase, evaluation) {
+            console.log('Updating test result:', { testCase, evaluation });
+            const testElement = document.getElementById(`test-${testCase.id}`);
+            if (!testElement) {
+                console.error('Test element not found:', testCase.id);
+                return;
+            }
+
+            const statusElement = testElement.querySelector('.status');
+            if (statusElement) {
+                statusElement.textContent = 'Completed';
+                statusElement.className = 'status completed';
+            }
+
+            const resultElement = testElement.querySelector('.result');
+            if (resultElement) {
+                // Format sources for display
+                const sourcesHtml = evaluation.sources && evaluation.sources.length > 0
+                    ? `<div class="sources">
+                        <h4>Sources:</h4>
+                        <ul>
+                            ${evaluation.sources.map(source => {
+                                console.log('Processing source:', source);
+                                // Handle different types of source links
+                                let sourceContent = '';
+                                if (source && source.content) {
+                                    sourceContent = `
+                                        <div class="source-content">
+                                            <pre>${source.content}</pre>
+                                        </div>
+                                    `;
+                                }
+                                
+                                return `
+                                    <li>
+                                        ${source && source.name ? `<strong>${source.name}</strong>` : ''}
+                                        ${source && source.type ? `<span class="source-type">${source.type}</span>` : ''}
+                                        ${sourceContent}
+                                    </li>
+                                `;
+                            }).join('')}
+                        </ul>
+                       </div>`
+                    : '<div class="sources"><p>No sources provided</p></div>';
+
+                resultElement.innerHTML = `
+                    <div class="response">
+                        <h4>Response:</h4>
+                        <div class="response-content">${evaluation.summary}</div>
+                    </div>
+                    ${sourcesHtml}
+                    <div class="metrics">
+                        <div class="score">Weighted Score: ${evaluation.weightedScore.toFixed(2)}/5</div>
+                        <div class="metric">Accuracy: ${evaluation.metrics.accuracy.toFixed(2)}</div>
+                        <div class="metric">Completeness: ${evaluation.metrics.completeness.toFixed(2)}</div>
+                        <div class="metric">Clarity: ${evaluation.metrics.clarity.toFixed(2)}</div>
+                        <div class="metric">Sources: ${evaluation.metrics.sources.toFixed(2)}</div>
+                        <div class="response-time">Response Time: ${evaluation.responseTime}ms</div>
+                    </div>
+                `;
+            }
+
+            // Update test case with results
+            testCase.status = 'completed';
+            testCase.response = evaluation.summary;
+            testCase.evaluation = evaluation;
+            testCase.weightedScore = evaluation.weightedScore;
+        }
+    </script>
+</body>
+</html> 

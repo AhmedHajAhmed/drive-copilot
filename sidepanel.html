@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Drive Copilot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="search-container">
+            <div class="search-mode-selector">
+                <button class="mode-btn active" data-mode="document">Document Search</button>
+                <button class="mode-btn" data-mode="content">Content Search</button>
+                <button class="mode-btn" data-mode="question">Ask Question</button>
+            </div>
+            
+            <div class="search-input-container">
+                <input type="text" id="searchInput" placeholder="Enter your search...">
+                <button id="searchButton">Search</button>
+            </div>
+
+            <div class="search-options">
+                <!-- Document Search Options -->
+                <div class="search-option-panel" id="documentOptions">
+                    <div class="option-group">
+                        <label>File Type:</label>
+                        <select id="fileType">
+                            <option value="all">All Types</option>
+                            <option value="document">Documents</option>
+                            <option value="spreadsheet">Spreadsheets</option>
+                            <option value="presentation">Presentations</option>
+                            <option value="pdf">PDFs</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label>Sort By:</label>
+                        <select id="sortBy">
+                            <option value="relevance">Relevance</option>
+                            <option value="date">Date</option>
+                            <option value="name">Name</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Content Search Options -->
+                <div class="search-option-panel hidden" id="contentOptions">
+                    <div class="option-group">
+                        <label>Target Location:</label>
+                        <input type="text" id="targetLocation" placeholder="Enter folder or document name">
+                    </div>
+                    <div class="option-group">
+                        <label>Search Within:</label>
+                        <select id="searchScope">
+                            <option value="exact">Exact Match</option>
+                            <option value="similar">Similar Content</option>
+                            <option value="context">With Context</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <span>Searching...</span>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <div id="resultsContainer" class="results-container">
+            <div id="resultsList"></div>
+        </div>
+    </div>
+    <script src="sidepanel.js"></script>
+</body>
+</html> 

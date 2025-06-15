@@ -1,0 +1,37 @@
+{
+  "name": "drive-copilot",
+  "version": "1.0.0",
+  "description": "AI-powered Google Drive copilot Chrome extension",
+  "main": "background.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "test": "jest"
+  },
+  "keywords": [
+    "chrome-extension",
+    "google-drive",
+    "ai",
+    "search",
+    "copilot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "babel-loader": "^9.1.2",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.1",
+    "dotenv": "^16.5.0",
+    "dotenv-webpack": "^8.1.0",
+    "jest": "^29.5.0",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.85.0",
+    "webpack-cli": "^5.1.1"
+  },
+  "dependencies": {
+    "openai": "^4.28.0",
+    "pdfjs-dist": "^3.4.120"
+  }
+}

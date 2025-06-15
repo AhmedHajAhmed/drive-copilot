@@ -1,0 +1,355 @@
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Loading animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #3b82f6;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Source attribution styling */
+.source-attribution {
+    font-size: 0.875rem;
+    color: #6b7280;
+    border-left: 3px solid #e5e7eb;
+    padding-left: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* Document preview card */
+.document-preview {
+    transition: all 0.2s ease;
+}
+
+.document-preview:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Base styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Search Container */
+.search-container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* Search Mode Selector */
+.search-mode-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+    color: #5f6368;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    z-index: 1;
+}
+
+.mode-btn:hover {
+    background: #f5f5f5;
+    border-color: #dadce0;
+}
+
+.mode-btn:active {
+    transform: translateY(1px);
+}
+
+.mode-btn.active {
+    background: #1a73e8;
+    color: white;
+    border-color: #1a73e8;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.mode-btn.active:hover {
+    background: #1557b0;
+    border-color: #1557b0;
+}
+
+/* Search Input */
+.search-input-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#searchInput {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+#searchButton {
+    padding: 12px 24px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+#searchButton:hover {
+    background: #1557b0;
+}
+
+/* Search Options */
+.search-options {
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.search-option-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.search-option-panel.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.option-group label {
+    font-size: 14px;
+    color: #5f6368;
+}
+
+.option-group select,
+.option-group input {
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Results Container */
+.results-container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.answer-container {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.answer-summary {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.answer-sources {
+    margin-bottom: 20px;
+}
+
+.answer-sources h3 {
+    font-size: 16px;
+    color: #5f6368;
+    margin-bottom: 10px;
+}
+
+.answer-sources ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.answer-sources li {
+    margin-bottom: 8px;
+}
+
+.answer-sources a {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.answer-sources a:hover {
+    text-decoration: underline;
+}
+
+.file-type {
+    color: #5f6368;
+    font-size: 14px;
+}
+
+.answer-snippets {
+    margin-top: 20px;
+}
+
+.answer-snippets h3 {
+    font-size: 16px;
+    color: #5f6368;
+    margin-bottom: 10px;
+}
+
+.snippet-item {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+.snippet-context {
+    font-size: 14px;
+    color: #5f6368;
+    margin-bottom: 8px;
+}
+
+.snippet-text {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.snippet-source {
+    text-align: right;
+}
+
+.snippet-source a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.snippet-source a:hover {
+    text-decoration: underline;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #1a73e8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error Message */
+.error-message {
+    color: #d93025;
+    background: #fce8e6;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: none;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .container {
+        padding: 8px;
+    }
+    
+    .search-box {
+        flex-direction: column;
+    }
+    
+    .checkbox-group {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .date-range {
+        flex-direction: column;
+        align-items: stretch;
+    }
+} 
